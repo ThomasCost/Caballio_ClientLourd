@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.security.MessageDigest;
+import java.nio.charset.StandardCharsets;
 
 import controleur.*;
 
@@ -17,16 +19,46 @@ public class Modele {
     // 0. AUTHENTIFICATION
     // ========================================================================
     
+    
+ // ========================================================================
+    // SÉCURITÉ : HACHAGE SHA-256 + GRAIN DE SEL
+    // ========================================================================
+    public static String hacherMdp(String mdpAClair) {
+        try {
+            // Notre "grain de sel" (idéalement, on utiliserait un sel dynamique en BDD, 
+            // mais un sel statique applicatif est déjà un excellent début pour ce niveau)
+            String sel = "Caballio_Secret_2026!"; 
+            String mdpAvecSel = mdpAClair + sel;
+
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(mdpAvecSel.getBytes(StandardCharsets.UTF_8));
+            
+            // Conversion des bytes en format hexadécimal (texte lisible)
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if(hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (Exception ex) {
+            throw new RuntimeException("Erreur lors du hachage du mot de passe", ex);
+        }
+    }
+    
+    
     public static Utilisateur verifierConnexion(String email, String mdp) {
         Utilisateur unUtilisateur = null;
         String requete = "SELECT * FROM utilisateur WHERE MailUtilisateur = ? AND MdpUtilisateur = ? AND BloqueUtilisateur = 0";
         
         try {
+            String mdpHache = hacherMdp(mdp); 
+            
             uneBdd.seConnecter();
             Connection maConnexion = uneBdd.getMaConnexion();
             PreparedStatement unStat = maConnexion.prepareStatement(requete);
             unStat.setString(1, email);
-            unStat.setString(2, mdp);
+            unStat.setString(2, mdpHache);
             ResultSet unRes = unStat.executeQuery();
             
             if (unRes.next()) {
