@@ -24,4 +24,8 @@ public class Client {
     public String getTelephone() { return telephone; }
     public String getVille() { return ville; }
     public Date getDateAjout() { return dateAjout; }
+    
+    public void setIdClient(int unId) {
+        this.idClient = unId;
+    }
 }

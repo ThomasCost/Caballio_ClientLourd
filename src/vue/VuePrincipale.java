@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -25,16 +26,13 @@ import modele.Modele;
 
 public class VuePrincipale extends JFrame implements ActionListener {
 
-    // --- Couleurs de la charte ---
     private Color vertFonce = new Color(34, 100, 50);
     private Color blanc = Color.WHITE;
 
-    // --- Conteneurs principaux ---
     private JPanel panelMenu = new JPanel();
     private JPanel panelContenu = new JPanel();
     private CardLayout affichageCartes = new CardLayout();
 
-    // --- Boutons du menu ---
     private JButton btAccueil = new JButton("Accueil");
     private JButton btCentres = new JButton("Centres");
     private JButton btClients = new JButton("Clients");
@@ -43,6 +41,20 @@ public class VuePrincipale extends JFrame implements ActionListener {
     private JButton btFactures = new JButton("Factures");
     private JButton btQuitter = new JButton("Se déconnecter");
 
+    // --- VARIABLES CRUD CLIENT ---
+    private JTable tableClients;
+    private DefaultTableModel modeleTableClients;
+    private JButton btAjouterClient = new JButton("+ Ajouter");
+    private JButton btModifierClient = new JButton("✎ Modifier");
+    private JButton btSupprimerClient = new JButton("🗑 Supprimer");
+
+    // --- NOUVEAU : VARIABLES CRUD CHEVAL ---
+    private JTable tableChevaux;
+    private DefaultTableModel modeleTableChevaux;
+    private JButton btAjouterCheval = new JButton("+ Ajouter");
+    private JButton btModifierCheval = new JButton("✎ Modifier");
+    private JButton btSupprimerCheval = new JButton("🗑 Supprimer");
+
     public VuePrincipale() {
         this.setTitle("Caballio - Tableau de bord Administrateur");
         this.setBounds(100, 100, 1100, 650);
@@ -50,54 +62,36 @@ public class VuePrincipale extends JFrame implements ActionListener {
         this.setLocationRelativeTo(null);
         this.setLayout(new BorderLayout());
 
-        // -----------------------------------------
-        // 1. MENU LATÉRAL (GAUCHE)
-        // -----------------------------------------
+        // MENU LATÉRAL
         this.panelMenu.setPreferredSize(new Dimension(220, 650));
         this.panelMenu.setBackground(vertFonce);
         this.panelMenu.setLayout(new GridLayout(10, 1, 10, 10));
 
         JLabel lblTitre = new JLabel("CABALLIO", SwingConstants.CENTER);
-        lblTitre.setForeground(blanc);
-        lblTitre.setFont(new Font("Arial", Font.BOLD, 26));
+        lblTitre.setForeground(blanc); lblTitre.setFont(new Font("Arial", Font.BOLD, 26));
         this.panelMenu.add(lblTitre);
 
-        styliserBoutonMenu(btAccueil);
-        styliserBoutonMenu(btCentres);
-        styliserBoutonMenu(btClients);
-        styliserBoutonMenu(btChevaux);
-        styliserBoutonMenu(btEquipements);
-        styliserBoutonMenu(btFactures);
-        
-        this.panelMenu.add(new JLabel("")); // Espace vide pour aérer
-        styliserBoutonMenu(btQuitter);
+        styliserBoutonMenu(btAccueil); styliserBoutonMenu(btCentres); styliserBoutonMenu(btClients);
+        styliserBoutonMenu(btChevaux); styliserBoutonMenu(btEquipements); styliserBoutonMenu(btFactures);
+        this.panelMenu.add(new JLabel("")); styliserBoutonMenu(btQuitter);
 
-        // -----------------------------------------
-        // 2. ZONE DE CONTENU (CENTRE)
-        // -----------------------------------------
+        // CONTENU
         this.panelContenu.setLayout(affichageCartes);
         this.panelContenu.setBackground(blanc);
 
-        // --- Création des différentes vues ---
-        // Accueil
         JPanel panelAccueil = new JPanel(new BorderLayout());
         panelAccueil.setBackground(blanc);
         JLabel lblAccueil = new JLabel("Bienvenue sur l'espace d'administration Caballio", SwingConstants.CENTER);
-        lblAccueil.setFont(new Font("Arial", Font.PLAIN, 22));
-        lblAccueil.setForeground(vertFonce);
+        lblAccueil.setFont(new Font("Arial", Font.PLAIN, 22)); lblAccueil.setForeground(vertFonce);
         panelAccueil.add(lblAccueil, BorderLayout.CENTER);
 
-        // Ajout des panneaux au CardLayout
         this.panelContenu.add(panelAccueil, "Accueil");
         this.panelContenu.add(construirePanelCentres(), "Centres");
-        this.panelContenu.add(construirePanelClients(), "Clients");
-        this.panelContenu.add(construirePanelChevaux(), "Chevaux");
+        this.panelContenu.add(construirePanelClients(), "Clients"); 
+        this.panelContenu.add(construirePanelChevaux(), "Chevaux"); // Onglet modifié
         this.panelContenu.add(construirePanelEquipements(), "Equipements");
         this.panelContenu.add(construirePanelFactures(), "Factures");
 
-        // -----------------------------------------
-        // 3. ASSEMBLAGE
-        // -----------------------------------------
         this.add(this.panelMenu, BorderLayout.WEST);
         this.add(this.panelContenu, BorderLayout.CENTER);
 
@@ -106,145 +100,183 @@ public class VuePrincipale extends JFrame implements ActionListener {
     }
 
     // =========================================
-    // MÉTHODES DE CONSTRUCTION DES DONNÉES
+    // PANEL CLIENTS
     // =========================================
-
-    private JPanel construirePanelCentres() {
-        String[] colonnes = {"ID", "Nom du Centre", "Adresse", "Code Postal", "Ville", "Téléphone"};
-        ArrayList<Centre> liste = Modele.selectAllCentres();
-        Object[][] donnees = new Object[liste.size()][colonnes.length];
-        
-        for (int i = 0; i < liste.size(); i++) {
-            donnees[i][0] = liste.get(i).getIdCentre();
-            donnees[i][1] = liste.get(i).getNomCentre();
-            donnees[i][2] = liste.get(i).getAdresseCentre();
-            donnees[i][3] = liste.get(i).getCodePostalCentre();
-            donnees[i][4] = liste.get(i).getVilleCentre();
-            donnees[i][5] = liste.get(i).getTelephoneCentre();
-        }
-        return creerPanelTableau("Gestion des Centres Équestres", colonnes, donnees);
-    }
-
     private JPanel construirePanelClients() {
-        String[] colonnes = {"ID", "Nom", "Prénom", "Téléphone", "Ville", "Date d'ajout"};
-        ArrayList<Client> liste = Modele.selectAllClients();
-        Object[][] donnees = new Object[liste.size()][colonnes.length];
-        
-        for (int i = 0; i < liste.size(); i++) {
-            donnees[i][0] = liste.get(i).getIdClient();
-            donnees[i][1] = liste.get(i).getNom();
-            donnees[i][2] = liste.get(i).getPrenom();
-            donnees[i][3] = liste.get(i).getTelephone();
-            donnees[i][4] = liste.get(i).getVille();
-            donnees[i][5] = liste.get(i).getDateAjout();
-        }
-        return creerPanelTableau("Gestion des Clients", colonnes, donnees);
-    }
-
-    private JPanel construirePanelChevaux() {
-        String[] colonnes = {"ID", "Nom", "Sexe", "Race", "ID Centre", "ID Propriétaire"};
-        ArrayList<Cheval> liste = Modele.selectAllChevaux();
-        Object[][] donnees = new Object[liste.size()][colonnes.length];
-        
-        for (int i = 0; i < liste.size(); i++) {
-            donnees[i][0] = liste.get(i).getIdCheval();
-            donnees[i][1] = liste.get(i).getNom();
-            donnees[i][2] = liste.get(i).getSexe();
-            donnees[i][3] = liste.get(i).getRace();
-            donnees[i][4] = liste.get(i).getIdCentre();
-            donnees[i][5] = liste.get(i).getIdClient();
-        }
-        return creerPanelTableau("Gestion des Chevaux", colonnes, donnees);
-    }
-
-    private JPanel construirePanelEquipements() {
-        String[] colonnes = {"ID", "Nom de l'équipement", "Date d'ajout", "ID Centre", "ID Propriétaire"};
-        ArrayList<Equipement> liste = Modele.selectAllEquipements();
-        Object[][] donnees = new Object[liste.size()][colonnes.length];
-        
-        for (int i = 0; i < liste.size(); i++) {
-            donnees[i][0] = liste.get(i).getIdEquipement();
-            donnees[i][1] = liste.get(i).getNomEquipement();
-            donnees[i][2] = liste.get(i).getDateAjoutEquipement();
-            donnees[i][3] = liste.get(i).getIdCentre();
-            donnees[i][4] = liste.get(i).getIdProprietaire();
-        }
-        return creerPanelTableau("Gestion des Équipements", colonnes, donnees);
-    }
-
-    private JPanel construirePanelFactures() {
-        String[] colonnes = {"ID Facture", "Date", "Montant Total (€)", "ID Client", "ID Centre"};
-        ArrayList<Facture> liste = Modele.selectAllFactures();
-        Object[][] donnees = new Object[liste.size()][colonnes.length];
-        
-        for (int i = 0; i < liste.size(); i++) {
-            donnees[i][0] = liste.get(i).getIdFacture();
-            donnees[i][1] = liste.get(i).getDateAjoutFacture();
-            donnees[i][2] = liste.get(i).getMontantTotal();
-            donnees[i][3] = liste.get(i).getIdClient();
-            donnees[i][4] = liste.get(i).getIdCentre();
-        }
-        return creerPanelTableau("Historique des Factures", colonnes, donnees);
-    }
-
-    // =========================================
-    // MÉTHODES UTILITAIRES (GÉNÉRATEURS D'UI)
-    // =========================================
-
-    private JPanel creerPanelTableau(String titre, String[] colonnes, Object[][] donnees) {
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBackground(blanc);
-        
-        JLabel lblTitre = new JLabel(titre, SwingConstants.CENTER);
-        lblTitre.setFont(new Font("Arial", Font.BOLD, 22));
-        lblTitre.setForeground(vertFonce);
+        JPanel panel = new JPanel(new BorderLayout(10, 10)); panel.setBackground(blanc);
+        JLabel lblTitre = new JLabel("Gestion des Clients", SwingConstants.CENTER);
+        lblTitre.setFont(new Font("Arial", Font.BOLD, 22)); lblTitre.setForeground(vertFonce);
         panel.add(lblTitre, BorderLayout.NORTH);
 
-        DefaultTableModel modeleTable = new DefaultTableModel(donnees, colonnes);
-        JTable table = new JTable(modeleTable);
-        table.setRowHeight(25);
-        table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
-        table.getTableHeader().setBackground(vertFonce);
-        table.getTableHeader().setForeground(blanc);
-
-        JScrollPane scrollPane = new JScrollPane(table);
-        panel.add(scrollPane, BorderLayout.CENTER);
+        String[] colonnes = {"ID", "Nom", "Prénom", "Téléphone", "Ville", "Date d'ajout", "Adresse", "Code Postal"};
+        modeleTableClients = new DefaultTableModel(null, colonnes);
+        tableClients = new JTable(modeleTableClients);
+        tableClients.setRowHeight(25); tableClients.getTableHeader().setBackground(vertFonce); tableClients.getTableHeader().setForeground(blanc);
         
+        rafraichirTableauClients();
+        tableClients.getColumnModel().getColumn(6).setMinWidth(0); tableClients.getColumnModel().getColumn(6).setMaxWidth(0);
+        tableClients.getColumnModel().getColumn(7).setMinWidth(0); tableClients.getColumnModel().getColumn(7).setMaxWidth(0);
+
+        panel.add(new JScrollPane(tableClients), BorderLayout.CENTER);
+
+        JPanel panelBoutons = new JPanel(new FlowLayout()); panelBoutons.setBackground(blanc);
+        btAjouterClient.addActionListener(this); btModifierClient.addActionListener(this); btSupprimerClient.addActionListener(this);
+        panelBoutons.add(btAjouterClient); panelBoutons.add(btModifierClient); panelBoutons.add(btSupprimerClient);
+        panel.add(panelBoutons, BorderLayout.SOUTH);
+
         return panel;
     }
 
+    private void rafraichirTableauClients() {
+        modeleTableClients.setRowCount(0); 
+        ArrayList<Client> liste = Modele.selectAllClients();
+        for (Client c : liste) modeleTableClients.addRow(new Object[]{c.getIdClient(), c.getNom(), c.getPrenom(), c.getTelephone(), c.getVille(), c.getDateAjout(), c.getAdresse(), c.getCodePostal()});
+    }
+
+    // =========================================
+    // NOUVEAU : PANEL CHEVAUX
+    // =========================================
+    private JPanel construirePanelChevaux() {
+        JPanel panel = new JPanel(new BorderLayout(10, 10)); panel.setBackground(blanc);
+        JLabel lblTitre = new JLabel("Gestion des Chevaux", SwingConstants.CENTER);
+        lblTitre.setFont(new Font("Arial", Font.BOLD, 22)); lblTitre.setForeground(vertFonce);
+        panel.add(lblTitre, BorderLayout.NORTH);
+
+        String[] colonnes = {"ID", "Nom", "Sexe", "Race", "ID Centre", "ID Propriétaire"};
+        modeleTableChevaux = new DefaultTableModel(null, colonnes);
+        tableChevaux = new JTable(modeleTableChevaux);
+        tableChevaux.setRowHeight(25); tableChevaux.getTableHeader().setBackground(vertFonce); tableChevaux.getTableHeader().setForeground(blanc);
+        
+        rafraichirTableauChevaux();
+        panel.add(new JScrollPane(tableChevaux), BorderLayout.CENTER);
+
+        JPanel panelBoutons = new JPanel(new FlowLayout()); panelBoutons.setBackground(blanc);
+        btAjouterCheval.addActionListener(this); btModifierCheval.addActionListener(this); btSupprimerCheval.addActionListener(this);
+        panelBoutons.add(btAjouterCheval); panelBoutons.add(btModifierCheval); panelBoutons.add(btSupprimerCheval);
+        panel.add(panelBoutons, BorderLayout.SOUTH);
+
+        return panel;
+    }
+
+    private void rafraichirTableauChevaux() {
+        modeleTableChevaux.setRowCount(0); 
+        ArrayList<Cheval> liste = Modele.selectAllChevaux();
+        for (Cheval c : liste) modeleTableChevaux.addRow(new Object[]{c.getIdCheval(), c.getNom(), c.getSexe(), c.getRace(), c.getIdCentre(), c.getIdClient()});
+    }
+
+    // =========================================
+    // AUTRES PANELS (Inchangés)
+    // =========================================
+    private JPanel construirePanelCentres() {
+        String[] col = {"ID", "Nom du Centre", "Adresse", "Code Postal", "Ville", "Téléphone"};
+        ArrayList<Centre> liste = Modele.selectAllCentres(); Object[][] donnees = new Object[liste.size()][col.length];
+        for (int i = 0; i < liste.size(); i++) { donnees[i][0] = liste.get(i).getIdCentre(); donnees[i][1] = liste.get(i).getNomCentre(); donnees[i][2] = liste.get(i).getAdresseCentre(); donnees[i][3] = liste.get(i).getCodePostalCentre(); donnees[i][4] = liste.get(i).getVilleCentre(); donnees[i][5] = liste.get(i).getTelephoneCentre(); }
+        return creerPanelTableau("Gestion des Centres Équestres", col, donnees);
+    }
+    private JPanel construirePanelEquipements() {
+        String[] col = {"ID", "Nom de l'équipement", "Date d'ajout", "ID Centre", "ID Proprio"};
+        ArrayList<Equipement> liste = Modele.selectAllEquipements(); Object[][] donnees = new Object[liste.size()][col.length];
+        for (int i = 0; i < liste.size(); i++) { donnees[i][0] = liste.get(i).getIdEquipement(); donnees[i][1] = liste.get(i).getNomEquipement(); donnees[i][2] = liste.get(i).getDateAjoutEquipement(); donnees[i][3] = liste.get(i).getIdCentre(); donnees[i][4] = liste.get(i).getIdProprietaire(); }
+        return creerPanelTableau("Gestion des Équipements", col, donnees);
+    }
+    private JPanel construirePanelFactures() {
+        String[] col = {"ID Facture", "Date", "Montant Total", "ID Client", "ID Centre"};
+        ArrayList<Facture> liste = Modele.selectAllFactures(); Object[][] donnees = new Object[liste.size()][col.length];
+        for (int i = 0; i < liste.size(); i++) { donnees[i][0] = liste.get(i).getIdFacture(); donnees[i][1] = liste.get(i).getDateAjoutFacture(); donnees[i][2] = liste.get(i).getMontantTotal(); donnees[i][3] = liste.get(i).getIdClient(); donnees[i][4] = liste.get(i).getIdCentre(); }
+        return creerPanelTableau("Historique des Factures", col, donnees);
+    }
+    private JPanel creerPanelTableau(String titre, String[] colonnes, Object[][] donnees) {
+        JPanel panel = new JPanel(new BorderLayout(10, 10)); panel.setBackground(blanc);
+        JLabel lblTitre = new JLabel(titre, SwingConstants.CENTER); lblTitre.setFont(new Font("Arial", Font.BOLD, 22)); lblTitre.setForeground(vertFonce); panel.add(lblTitre, BorderLayout.NORTH);
+        DefaultTableModel modeleTable = new DefaultTableModel(donnees, colonnes); JTable table = new JTable(modeleTable);
+        table.setRowHeight(25); table.getTableHeader().setBackground(vertFonce); table.getTableHeader().setForeground(blanc); panel.add(new JScrollPane(table), BorderLayout.CENTER); return panel;
+    }
     private void styliserBoutonMenu(JButton bouton) {
-        bouton.setBackground(blanc);
-        bouton.setForeground(vertFonce);
-        bouton.setFont(new Font("Arial", Font.BOLD, 14));
-        bouton.setFocusPainted(false);
-        bouton.addActionListener(this);
-        this.panelMenu.add(bouton);
+        bouton.setBackground(blanc); bouton.setForeground(vertFonce); bouton.setFont(new Font("Arial", Font.BOLD, 14));
+        bouton.setFocusPainted(false); bouton.addActionListener(this); this.panelMenu.add(bouton);
     }
 
     // =========================================
     // GESTION DES CLICS BOUTONS
     // =========================================
-
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == btAccueil) {
-            affichageCartes.show(this.panelContenu, "Accueil");
-        } else if (e.getSource() == btCentres) {
-            affichageCartes.show(this.panelContenu, "Centres");
-        } else if (e.getSource() == btClients) {
-            affichageCartes.show(this.panelContenu, "Clients");
-        } else if (e.getSource() == btChevaux) {
-            affichageCartes.show(this.panelContenu, "Chevaux");
-        } else if (e.getSource() == btEquipements) {
-            affichageCartes.show(this.panelContenu, "Equipements");
-        } else if (e.getSource() == btFactures) {
-            affichageCartes.show(this.panelContenu, "Factures");
-        } else if (e.getSource() == btQuitter) {
-            int confirmation = JOptionPane.showConfirmDialog(this, "Voulez-vous vraiment vous déconnecter ?", "Déconnexion", JOptionPane.YES_NO_OPTION);
-            if (confirmation == JOptionPane.YES_OPTION) {
-                this.dispose(); 
-                new VueConnexion(); 
+        // Navigation
+        if (e.getSource() == btAccueil) affichageCartes.show(this.panelContenu, "Accueil");
+        else if (e.getSource() == btCentres) affichageCartes.show(this.panelContenu, "Centres");
+        else if (e.getSource() == btClients) affichageCartes.show(this.panelContenu, "Clients");
+        else if (e.getSource() == btChevaux) affichageCartes.show(this.panelContenu, "Chevaux");
+        else if (e.getSource() == btEquipements) affichageCartes.show(this.panelContenu, "Equipements");
+        else if (e.getSource() == btFactures) affichageCartes.show(this.panelContenu, "Factures");
+        else if (e.getSource() == btQuitter) {
+            if (JOptionPane.showConfirmDialog(this, "Se déconnecter ?", "Déconnexion", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                this.dispose(); new VueConnexion(); 
+            }
+        }
+        
+        // --- CRUD CLIENT ---
+        else if (e.getSource() == btAjouterClient) {
+            VueFormulaireClient form = new VueFormulaireClient(this, "Nouveau Client", null);
+            if (form.isValide()) { Modele.insertClient(form.getClientSaisi()); rafraichirTableauClients(); }
+        }
+        else if (e.getSource() == btSupprimerClient) {
+            int row = tableClients.getSelectedRow();
+            if (row == -1) JOptionPane.showMessageDialog(this, "Veuillez sélectionner un client.");
+            else {
+                int id = (int) tableClients.getValueAt(row, 0);
+                if (JOptionPane.showConfirmDialog(this, "Supprimer le client n°" + id + " ?", "Suppression", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                    Modele.deleteClient(id); rafraichirTableauClients();
+                }
+            }
+        }
+        else if (e.getSource() == btModifierClient) {
+            int row = tableClients.getSelectedRow();
+            if (row == -1) JOptionPane.showMessageDialog(this, "Veuillez sélectionner un client.");
+            else {
+                Client c = new Client((int) tableClients.getValueAt(row, 0), tableClients.getValueAt(row, 1).toString(), tableClients.getValueAt(row, 2).toString(), tableClients.getValueAt(row, 6).toString(), tableClients.getValueAt(row, 7).toString(), tableClients.getValueAt(row, 3).toString(), tableClients.getValueAt(row, 4).toString(), null);
+                VueFormulaireClient form = new VueFormulaireClient(this, "Modifier le Client", c);
+                if (form.isValide()) { Client cMaj = form.getClientSaisi(); cMaj.setIdClient(c.getIdClient()); Modele.updateClient(cMaj); rafraichirTableauClients(); }
+            }
+        }
+
+        // --- NOUVEAU : CRUD CHEVAL ---
+        else if (e.getSource() == btAjouterCheval) {
+            VueFormulaireCheval form = new VueFormulaireCheval(this, "Nouveau Cheval", null);
+            if (form.isValide()) { 
+                Modele.insertCheval(form.getChevalSaisi()); 
+                rafraichirTableauChevaux(); 
+            }
+        }
+        else if (e.getSource() == btSupprimerCheval) {
+            int row = tableChevaux.getSelectedRow();
+            if (row == -1) JOptionPane.showMessageDialog(this, "Veuillez sélectionner un cheval.");
+            else {
+                int id = (int) tableChevaux.getValueAt(row, 0);
+                if (JOptionPane.showConfirmDialog(this, "Supprimer le cheval n°" + id + " ?", "Suppression", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                    Modele.deleteCheval(id); 
+                    rafraichirTableauChevaux();
+                }
+            }
+        }
+        else if (e.getSource() == btModifierCheval) {
+            int row = tableChevaux.getSelectedRow();
+            if (row == -1) JOptionPane.showMessageDialog(this, "Veuillez sélectionner un cheval.");
+            else {
+                Cheval c = new Cheval(
+                    (int) tableChevaux.getValueAt(row, 0), 
+                    tableChevaux.getValueAt(row, 1).toString(), 
+                    tableChevaux.getValueAt(row, 2).toString(), 
+                    tableChevaux.getValueAt(row, 3).toString(), 
+                    (int) tableChevaux.getValueAt(row, 4), 
+                    (int) tableChevaux.getValueAt(row, 5)
+                );
+                VueFormulaireCheval form = new VueFormulaireCheval(this, "Modifier le Cheval", c);
+                if (form.isValide()) { 
+                    Cheval cMaj = form.getChevalSaisi(); 
+                    cMaj.setIdCheval(c.getIdCheval()); 
+                    Modele.updateCheval(cMaj); 
+                    rafraichirTableauChevaux(); 
+                }
             }
         }
     }

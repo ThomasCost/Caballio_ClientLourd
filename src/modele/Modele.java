@@ -283,4 +283,129 @@ public class Modele {
         } catch (SQLException exp) { System.out.println("Erreur SELECT Paiements : " + exp.getMessage()); }
         return lesPaiements;
     }
+    
+ // ========================================================================
+    // 2. LE CRUD (CREATE, UPDATE, DELETE) - ENTITÉ CLIENT
+    // ========================================================================
+
+    public static void insertClient(Client unClient) {
+        String requete = "INSERT INTO client (NomClient, PrenomClient, AdresseClient, CodePostalClient, TelephoneClient, VilleClient, DateAjoutClient) VALUES (?, ?, ?, ?, ?, ?, CURDATE());";
+        try {
+            uneBdd.seConnecter();
+            PreparedStatement unStat = uneBdd.getMaConnexion().prepareStatement(requete);
+            // Sécurisation : On remplace les ? par les vraies valeurs
+            unStat.setString(1, unClient.getNom());
+            unStat.setString(2, unClient.getPrenom());
+            unStat.setString(3, unClient.getAdresse());
+            unStat.setString(4, unClient.getCodePostal());
+            unStat.setString(5, unClient.getTelephone());
+            unStat.setString(6, unClient.getVille());
+            
+            unStat.executeUpdate(); // Exécution de l'insertion
+            
+            unStat.close();
+            uneBdd.seDeconnecter();
+        } catch (SQLException exp) {
+            System.out.println("Erreur INSERT Client : " + exp.getMessage());
+        }
+    }
+
+    public static void updateClient(Client unClient) {
+        String requete = "UPDATE client SET NomClient = ?, PrenomClient = ?, AdresseClient = ?, CodePostalClient = ?, TelephoneClient = ?, VilleClient = ? WHERE IdClient = ?;";
+        try {
+            uneBdd.seConnecter();
+            PreparedStatement unStat = uneBdd.getMaConnexion().prepareStatement(requete);
+            unStat.setString(1, unClient.getNom());
+            unStat.setString(2, unClient.getPrenom());
+            unStat.setString(3, unClient.getAdresse());
+            unStat.setString(4, unClient.getCodePostal());
+            unStat.setString(5, unClient.getTelephone());
+            unStat.setString(6, unClient.getVille());
+            unStat.setInt(7, unClient.getIdClient()); // La condition WHERE
+            
+            unStat.executeUpdate(); // Exécution de la mise à jour
+            
+            unStat.close();
+            uneBdd.seDeconnecter();
+        } catch (SQLException exp) {
+            System.out.println("Erreur UPDATE Client : " + exp.getMessage());
+        }
+    }
+
+    public static void deleteClient(int idClient) {
+        String requete = "DELETE FROM client WHERE IdClient = ?;";
+        try {
+            uneBdd.seConnecter();
+            PreparedStatement unStat = uneBdd.getMaConnexion().prepareStatement(requete);
+            unStat.setInt(1, idClient);
+            
+            unStat.executeUpdate(); // Exécution de la suppression
+            
+            unStat.close();
+            uneBdd.seDeconnecter();
+        } catch (SQLException exp) {
+            System.out.println("Erreur DELETE Client : " + exp.getMessage());
+        }
+    }
+    
+ // ========================================================================
+    // 3. LE CRUD (CREATE, UPDATE, DELETE) - ENTITÉ CHEVAL
+    // ========================================================================
+
+    public static void insertCheval(Cheval unCheval) {
+        String requete = "INSERT INTO cheval (NomCheval, SexeCheval, RaceCheval, IdCentre, IdClient) VALUES (?, ?, ?, ?, ?);";
+        try {
+            uneBdd.seConnecter();
+            PreparedStatement unStat = uneBdd.getMaConnexion().prepareStatement(requete);
+            unStat.setString(1, unCheval.getNom());
+            unStat.setString(2, unCheval.getSexe());
+            unStat.setString(3, unCheval.getRace());
+            unStat.setInt(4, unCheval.getIdCentre()); // Clé étrangère Centre
+            unStat.setInt(5, unCheval.getIdClient()); // Clé étrangère Propriétaire (Client)
+            
+            unStat.executeUpdate(); 
+            
+            unStat.close();
+            uneBdd.seDeconnecter();
+        } catch (SQLException exp) {
+            System.out.println("Erreur INSERT Cheval : " + exp.getMessage());
+        }
+    }
+
+    public static void updateCheval(Cheval unCheval) {
+        String requete = "UPDATE cheval SET NomCheval = ?, SexeCheval = ?, RaceCheval = ?, IdCentre = ?, IdClient = ? WHERE IdCheval = ?;";
+        try {
+            uneBdd.seConnecter();
+            PreparedStatement unStat = uneBdd.getMaConnexion().prepareStatement(requete);
+            unStat.setString(1, unCheval.getNom());
+            unStat.setString(2, unCheval.getSexe());
+            unStat.setString(3, unCheval.getRace());
+            unStat.setInt(4, unCheval.getIdCentre());
+            unStat.setInt(5, unCheval.getIdClient());
+            unStat.setInt(6, unCheval.getIdCheval()); // La condition WHERE
+            
+            unStat.executeUpdate(); 
+            
+            unStat.close();
+            uneBdd.seDeconnecter();
+        } catch (SQLException exp) {
+            System.out.println("Erreur UPDATE Cheval : " + exp.getMessage());
+        }
+    }
+
+    public static void deleteCheval(int idCheval) {
+        String requete = "DELETE FROM cheval WHERE IdCheval = ?;";
+        try {
+            uneBdd.seConnecter();
+            PreparedStatement unStat = uneBdd.getMaConnexion().prepareStatement(requete);
+            unStat.setInt(1, idCheval);
+            
+            unStat.executeUpdate(); 
+            
+            unStat.close();
+            uneBdd.seDeconnecter();
+        } catch (SQLException exp) {
+            System.out.println("Erreur DELETE Cheval : " + exp.getMessage());
+        }
+    }
 }
