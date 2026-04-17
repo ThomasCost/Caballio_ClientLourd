@@ -6,19 +6,19 @@ public class Cheval {
     private String nom, sexe, race;
     private Date dateAjout;
 
-    // Constructeur 1 (Complet avec Date)
+    // Constructeur 1 
     public Cheval(int idCheval, String nom, String sexe, String race, Date dateAjout, int idCentre, int idClient) {
         this.idCheval = idCheval; this.nom = nom; this.sexe = sexe; this.race = race;
         this.dateAjout = dateAjout; this.idCentre = idCentre; this.idClient = idClient;
     }
 
-    // Constructeur 2 (Sans ID et sans Date, souvent utilisé pour les ajouts simples)
+    // Constructeur 2 
     public Cheval(String nom, String sexe, String race, int idCentre, int idClient) {
         this.idCheval = 0; this.nom = nom; this.sexe = sexe; this.race = race;
         this.idCentre = idCentre; this.idClient = idClient;
     }
 
-    // === NOUVEAU CONSTRUCTEUR 3 (Celui attendu par notre CRUD : 6 paramètres) ===
+    //NOUVEAU CONSTRUCTEUR 3 
     public Cheval(int idCheval, String nom, String sexe, String race, int idCentre, int idClient) {
         this.idCheval = idCheval; 
         this.nom = nom; 
@@ -28,7 +28,7 @@ public class Cheval {
         this.idClient = idClient;
     }
 
-    // --- Les Getters ---
+    //  Les Getters
     public int getIdCheval() { return idCheval; }
     public String getNom() { return nom; }
     public String getSexe() { return sexe; }

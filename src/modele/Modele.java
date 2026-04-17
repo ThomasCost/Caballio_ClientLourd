@@ -25,15 +25,13 @@ public class Modele {
     // ========================================================================
     public static String hacherMdp(String mdpAClair) {
         try {
-            // Notre "grain de sel" (idéalement, on utiliserait un sel dynamique en BDD, 
-            // mais un sel statique applicatif est déjà un excellent début pour ce niveau)
+
             String sel = "Caballio_Secret_2026!"; 
             String mdpAvecSel = mdpAClair + sel;
 
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(mdpAvecSel.getBytes(StandardCharsets.UTF_8));
             
-            // Conversion des bytes en format hexadécimal (texte lisible)
             StringBuilder hexString = new StringBuilder();
             for (byte b : hash) {
                 String hex = Integer.toHexString(0xff & b);
@@ -293,7 +291,6 @@ public class Modele {
         try {
             uneBdd.seConnecter();
             PreparedStatement unStat = uneBdd.getMaConnexion().prepareStatement(requete);
-            // Sécurisation : On remplace les ? par les vraies valeurs
             unStat.setString(1, unClient.getNom());
             unStat.setString(2, unClient.getPrenom());
             unStat.setString(3, unClient.getAdresse());
@@ -301,7 +298,7 @@ public class Modele {
             unStat.setString(5, unClient.getTelephone());
             unStat.setString(6, unClient.getVille());
             
-            unStat.executeUpdate(); // Exécution de l'insertion
+            unStat.executeUpdate(); 
             
             unStat.close();
             uneBdd.seDeconnecter();
@@ -321,9 +318,9 @@ public class Modele {
             unStat.setString(4, unClient.getCodePostal());
             unStat.setString(5, unClient.getTelephone());
             unStat.setString(6, unClient.getVille());
-            unStat.setInt(7, unClient.getIdClient()); // La condition WHERE
+            unStat.setInt(7, unClient.getIdClient()); 
             
-            unStat.executeUpdate(); // Exécution de la mise à jour
+            unStat.executeUpdate(); 
             
             unStat.close();
             uneBdd.seDeconnecter();
@@ -339,7 +336,7 @@ public class Modele {
             PreparedStatement unStat = uneBdd.getMaConnexion().prepareStatement(requete);
             unStat.setInt(1, idClient);
             
-            unStat.executeUpdate(); // Exécution de la suppression
+            unStat.executeUpdate(); 
             
             unStat.close();
             uneBdd.seDeconnecter();
@@ -360,8 +357,8 @@ public class Modele {
             unStat.setString(1, unCheval.getNom());
             unStat.setString(2, unCheval.getSexe());
             unStat.setString(3, unCheval.getRace());
-            unStat.setInt(4, unCheval.getIdCentre()); // Clé étrangère Centre
-            unStat.setInt(5, unCheval.getIdClient()); // Clé étrangère Propriétaire (Client)
+            unStat.setInt(4, unCheval.getIdCentre()); 
+            unStat.setInt(5, unCheval.getIdClient()); 
             
             unStat.executeUpdate(); 
             
@@ -382,7 +379,7 @@ public class Modele {
             unStat.setString(3, unCheval.getRace());
             unStat.setInt(4, unCheval.getIdCentre());
             unStat.setInt(5, unCheval.getIdClient());
-            unStat.setInt(6, unCheval.getIdCheval()); // La condition WHERE
+            unStat.setInt(6, unCheval.getIdCheval()); 
             
             unStat.executeUpdate(); 
             
